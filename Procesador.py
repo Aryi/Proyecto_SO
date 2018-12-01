@@ -1,20 +1,20 @@
 import sys
 
 
-RAM = [[-1]*6 for _ in range(6)]
-VR = [[-1]*6 for _ in range(4)]
+RAM = [[-1]*6 for _ in range(6)]		#Matriz de la ram (unicamente guarda a el id del proceso al que esta asignada)
+VR = [[-1]*6 for _ in range(4)]			#Matriz de la memoria virtual la misma historia
 
-def findID(tabla_de_procesos , id):
+def findID(tabla_de_procesos , id):					#Regresa en indice de un id dado, -1 si no existe
 	for i in range(len(tabla_de_procesos)):
 		if(tabla_de_procesos[i].id == id):
 			return i
 	return -1
 
 
-class fila_proceso():
+class fila_proceso():								#Define la informacion de cada bloque del proceso
 	def __init__(self):
-		self.memoria_usada = 'x'
-		self.pagina = -1
+		self.memoria_usada = 'x'					#Tipo de memoria donde se almacena ('R' == ram , 'V' == virtual , 'x' == No asignada)
+		self.pagina = -1							#Demaciado ovio
 		self.segmento = -1
 	def __init__(self,M,P,S):
 		self.memoria_usada = M
@@ -23,17 +23,15 @@ class fila_proceso():
 
 class proceso():
 	def __init__(self , a , _id):
-		self.id = _id;
-		self.size = a;
-		self.proc_table = []
+		self.id = _id;					#Id unico del proceso
+		self.size = a;					#Tamaño en en memoria del proceso
+		self.proc_table = []					#Tabla de guarda cada fila de proceso con sus respectivas direcciones
 	
-	def assign(self,a):
-		print(a)
-		if(a <= 4):
-			for i in range(6):
+	def assign(self,a):					#Guarda un proceso en RAM. Regresa True si todo el proceso se asigna en ram,
+		if(a <= 4):						#asi mismo inserta en la matriz el id del proceso, regresa False en caso
+			for i in range(6):			# de no entrar en la matriz
 				for j in range(6):
 					if(RAM[i][j] == -1):
-						print(str(i) + " , " + str(j))
 						RAM[i][j] = self.id
 						self.proc_table.append(fila_proceso('R',i,j))
 						return True
@@ -49,8 +47,30 @@ class proceso():
 						else:
 							RAM[i][j] = -1;
 							return False
-			
-	def clear(self):
+	
+	def assignV(self,a):					#Guarda un proceso en RAM. Regresa True si todo el proceso se asigna en ram,	
+		if(a <= 4):							#asi mismo inserta en la matriz el id del proceso, regresa False en caso
+			for i in range(4):				# de no entrar en la matriz
+				for j in range(6):
+					if(VR[i][j] == -1):
+						VR[i][j] = self.id
+						self.proc_table.append(fila_proceso('V',i,j))
+						return True
+			return False
+		else:
+			for i in range(6):
+				for j in range(6):
+					if(VR[i][j] == -1):
+						VR[i][j] = self.id
+						if(self.assignV(a-4)):
+							self.proc_table.append(fila_proceso('V',i,j))
+							return True
+						else:
+							VR[i][j] = -1;
+							return False
+
+
+	def clear(self):									#Borra el proceso de memoria, no lo elimina
 		for i in self.proc_table:
 			if(i.memoria_usada == 'R'):
 				RAM[i.pagina][i.segmento] = -1;
@@ -58,8 +78,16 @@ class proceso():
 				VR[i.pagina][i.segmento] = -1;
 			else:
 				print("Memoria no asignada.")
+		self.proc_table.clear()
 
-
+	def swap(self,type):		#intercambia de memoria el proceso, en caso de no ser posible lo regresa a su estado inicial
+		self.clear()
+		if(type == 0):
+			if(not self.assignV(self.size)):
+				swap(1)
+		else:
+			if(not self.assign(self.size)):
+				swap(0)
 
 
 op = int(1)
@@ -86,17 +114,37 @@ while(t):
 		ind = findID(proc,op)
 		if(ind != -1):
 			proc[ind].clear()
-			proc.pop(ind)
+			proc.pop(ind)				#Borra el proceso
 			noProcesos -= 1;
 		else:
 			print("indice no valido")
 
 	elif(op == 3):
-
+		print("Dame el id del proceso")
+		op = int(input())
+		ind = findID(proc,op)
+		if(ind != -1):
+			proc[ind].swap(0)
+		else:
+			print("indice no valido")
 	elif(op == 4):
+		print("Dame el id del proceso")
+		op = int(input())
+		ind = findID(proc,op)
+		if(ind != -1):
+			proc[ind].swap(1)
+		else:
+			print("indice no valido")
+	elif(op == 5):
+		t = 0
+	elif(op == 6):								#Usado para debug
 		for i in RAM:
 				for j in i:
 					sys.stdout.write(str(j)+" ")
 				print("\n")
-	elif(op == 5):
-		t = 0
+		print("\n")
+		for i in VR:
+			for j in i:
+				sys.stdout.write(str(j)+" ")
+			print("\n")
+
