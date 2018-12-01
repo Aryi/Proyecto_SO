@@ -10,6 +10,20 @@ def findID(tabla_de_procesos , id):					#Regresa en indice de un id dado, -1 si 
 			return i
 	return -1
 
+def toFisic(p,s,w):
+	x = int((((6*p)+(s%6))*4096)+w)
+	ans = ""
+	while(x > 0):
+		y = int(x%16)
+		if(y < 10):
+			ans = str(y)+ans
+		else:
+			ans = chr(int(y-10+65))+ans
+		x = x//16
+	for i in range(8 - len(ans)):
+		ans = "0"+ans;
+	ans = "0x"+ans
+	return ans
 
 class fila_proceso():								#Define la informacion de cada bloque del proceso
 	def __init__(self):
@@ -89,6 +103,26 @@ class proceso():
 			if(not self.assign(self.size)):
 				swap(0)
 
+	def showInfo(self):
+		x = 0
+		listOfData = []
+		for i in reversed(self.proc_table): 
+			ans = ""
+			if(i.memoria_usada == 'R'):
+				ans += "RAM\t"
+			elif(i.memoria_usada == 'V'):
+				ans += "VIRTUAL\t"
+			else:
+				ans += "NO ASIGNADA\t"
+			ans += str(i.pagina+1) + "\t"
+			ans += str(i.segmento+1) + "\t"
+			ans += toFisic(x//6,x,0)+"\t"
+			ans += toFisic(i.pagina,i.segmento,367)
+			listOfData.append(ans)
+			print(ans)
+			x += 1
+		return listOfData
+
 
 op = int(1)
 t = 1;
@@ -147,4 +181,11 @@ while(t):
 			for j in i:
 				sys.stdout.write(str(j)+" ")
 			print("\n")
-
+	elif(op == 7):
+		print("Dame el id del proceso")
+		op = int(input())
+		ind = findID(proc,op)
+		if(ind != -1):
+			proc[ind].showInfo()
+		else:
+			print("indice no valido")
