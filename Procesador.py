@@ -6,6 +6,9 @@ import random
 from random import randrange
 from tkinter import messagebox
 
+#Variables globales
+tabla_STR = "Memoria\t  Pagina\tSegmento\t  Direccion Virtual\t\tDireccion fisica\n"
+
 #funciones del menu
 
 t = 1;
@@ -96,7 +99,7 @@ scrollyTAP=Scrollbar(admin_pros,command=tablaadminpros.yview)
 scrollyTAP.grid(row=1, column=1, sticky="nsew")
 
 tablaadminpros.config(yscrollcommand=scrollyTAP.set)
-tablaadminpros.insert("insert","Memoria\t\tPagina\t\tSegmento\t\tDireccion Virtual\t\t\tDireccion fisica\n")
+tablaadminpros.insert("insert",tabla_STR)
 tablaadminpros.config(state="disable")
 
 
@@ -158,7 +161,7 @@ def eliminar_tabla(tabla):
 	DV="44444"
 	DF="5"
 	tabla.delete('1.0', END)
-	tabla.insert("insert","Memoria\t\tPagina\t\tSegmento\t\tDireccion Virtual\t\t\tDireccion fisica\n")
+	tabla.insert("insert",tabla_STR)
 	for i in range (0,3):
 		tabla.insert("insert","111\t\t22\t\t3\t\t44444\t\t\t5\n")
 	tabla.config(state="disable")
@@ -272,7 +275,7 @@ class proceso():
 						return True
 			return False
 		else:
-			for i in range(6):
+			for i in range(4):
 				for j in range(6):
 					if(VR[i][j] == -1):
 						VR[i][j] = self.id
@@ -298,30 +301,40 @@ class proceso():
 		self.clear()
 		if(type == 0):
 			if(not self.assignV(self.size)):
-				swap(1)
+				self.swap(1)
+				return False
+			else:
+				return True
 		else:
 			if(not self.assign(self.size)):
-				swap(0)
+				self.swap(0)
+				return False
+			else:
+				return True
+
 
 	def showInfo(self):
 		tablaadminpros.config(state="normal")
 		tablaadminpros.delete('1.0', END)
-		tablaadminpros.insert("insert","Memoria\t\tPagina\t\tSegmento\t\tDireccion Virtual\t\t\tDireccion fisica\n")
+		tablaadminpros.insert("insert",tabla_STR)
 		tablaadminpros.config(state="disable")
 		x = 0
+		y = 367
 		listOfData = []
 		for i in reversed(self.proc_table): 
+			y = 367
 			ans = ""
 			if(i.memoria_usada == 'R'):
-				ans += "RAM\t\t"
+				ans += "  RAM\t"
 			elif(i.memoria_usada == 'V'):
-				ans += "VIRTUAL\t\t"
+				y += 147456
+				ans += "VIRTUAL\t"
 			else:
-				ans += "NO ASIGNADA\t\t"
-			ans += str(i.pagina+1) + "\t\t"
-			ans += str(i.segmento+1) + "\t\t"
-			ans += toFisic(x//6,x,0)+"\t\t\t"
-			ans += toFisic(i.pagina,i.segmento,367)
+				ans += "NO ASIGNADA\t"
+			ans += "    "+str(i.pagina+1) + "\t"
+			ans += "    "+str(i.segmento+1) + "\t"
+			ans += "    "+toFisic(x//6,x,0)+"\t\t\t"
+			ans += toFisic(i.pagina,i.segmento,y)
 			listOfData.append(ans)
 			x += 1
 			llenar_tabla_AdmP(ans)
@@ -349,8 +362,35 @@ def crear_p(op):
 		llenarRAM(idProcesos)
 		messagebox.showinfo("AYE","Proceso Creado")
 	else:
-		messagebox.showinfo("Error","No se pudo crear el proceso")
-		proc.pop()
+
+		for i in proc:
+			if(i.id != idProcesos+1 and i.swap(0)):
+				if(proc[noProcesos].assign(proc[noProcesos].size)):
+					noProcesos +=1;
+					idProcesos +=1;
+					tablapros.insert("insert",str(idProcesos)+"\t     "+str(op)+"\n")
+					tablapros.config(state="disable")
+					ver[idProcesos]= Button(ventana, text="ver"+str(idProcesos),command=lambda:proc[id].showInfo())
+					ver[idProcesos].place(x=160,y=y)
+					y+=27
+					llenarRAM(idProcesos)
+					llenarSWAP(i.id)
+					messagebox.showinfo("AYE","Proceso Creado")
+					break
+				else:
+					i.swap(1)
+			elif(i.id == idProcesos+1):
+				if(i.assignV(i.size)):
+					noProcesos +=1;
+					idProcesos +=1;
+					tablapros.insert("insert",str(idProcesos)+"\t     "+str(op)+"\n")
+					tablapros.config(state="disable")
+					ver[idProcesos]= Button(ventana, text="ver"+str(idProcesos),command=lambda:proc[id].showInfo())
+					ver[idProcesos].place(x=160,y=y)
+					y+=27
+					llenarSWAP(idProcesos)
+					messagebox.showinfo("AYE","Proceso Creado")
+					break
 
 def eliminar_P(op):
 	global noProcesos
@@ -439,9 +479,9 @@ def llenarRAM(id):
 	for i in range(0,6):
 		for j in range(0,6):
 			if(RAM[i][j]==id):
-				RAMT[i][j].config(bg=color)
+				RAMT[i][j].config(bg=color,text=id)
 			elif(RAM[i][j]==-1):
-				RAMT[i][j].config(bg="red")
+				RAMT[i][j].config(bg="red",text="")
 
 def llenarSWAP(id):
 	global VR
@@ -450,9 +490,9 @@ def llenarSWAP(id):
 	for i in range(0,4):
 		for j in range(0,6):
 			if(VR[i][j]==id):
-				SWAPT[i][j].config(bg=color)
+				SWAPT[i][j].config(bg=color,text=id)
 			elif(VR[i][j]==-1):
-				SWAPT[i][j].config(bg="red")
+				SWAPT[i][j].config(bg="red",text="")
 		
 ventana.mainloop()
 
