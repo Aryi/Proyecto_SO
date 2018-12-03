@@ -434,6 +434,28 @@ def eliminar_P(op):
 				ver[i+1]= Button(ventana, text="ver"+str(int(proc[i].id)),command=lambda:proc[9].showInfo())
 			elif(i==10):
 				ver[i+1]= Button(ventana, text="ver"+str(int(proc[i].id)),command=lambda:proc[10].showInfo())
+			elif(i==11):
+				ver[i+1]= Button(ventana, text="ver"+str(int(proc[i].id)),command=lambda:proc[11].showInfo())
+			elif(i==12):
+				ver[i+1]= Button(ventana, text="ver"+str(int(proc[i].id)),command=lambda:proc[12].showInfo())
+			elif(i==13):
+				ver[i+1]= Button(ventana, text="ver"+str(int(proc[i].id)),command=lambda:proc[13].showInfo())
+			elif(i==14):
+				ver[i+1]= Button(ventana, text="ver"+str(int(proc[i].id)),command=lambda:proc[14].showInfo())
+			elif(i==15):
+				ver[i+1]= Button(ventana, text="ver"+str(int(proc[i].id)),command=lambda:proc[15].showInfo())
+			elif(i==16):
+				ver[i+1]= Button(ventana, text="ver"+str(int(proc[i].id)),command=lambda:proc[16].showInfo())
+			elif(i==17):
+				ver[i+1]= Button(ventana, text="ver"+str(int(proc[i].id)),command=lambda:proc[17].showInfo())
+			elif(i==18):
+				ver[i+1]= Button(ventana, text="ver"+str(int(proc[i].id)),command=lambda:proc[18].showInfo())
+			elif(i==19):
+				ver[i+1]= Button(ventana, text="ver"+str(int(proc[i].id)),command=lambda:proc[19].showInfo())
+			elif(i==20):
+				ver[i+1]= Button(ventana, text="ver"+str(int(proc[i].id)),command=lambda:proc[20].showInfo())
+			elif(i==21):
+				ver[i+1]= Button(ventana, text="ver"+str(int(proc[i].id)),command=lambda:proc[21].showInfo())
 			else:
 				ver[i+1]= Button(ventana, text="ver"+str(int(proc[i].id)),command=lambda:proc[i].showInfo())
 			ver[i+1].place(x=160,y=y)
